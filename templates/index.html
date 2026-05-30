@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中文复习 · Chinese SRS Review</title>
+<style>
+  :root {
+    --bg: #f8f7f4;
+    --surface: #ffffff;
+    --border: #e6e4df;
+    --text: #2c2c2c;
+    --text-secondary: #78756c;
+    --accent: #b45309;
+    --accent-light: #fef3c7;
+    --accent-bg: #fffbeb;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --yellow: #ca8a04;
+    --yellow-bg: #fefce8;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --blue: #2563eb;
+    --blue-bg: #eff6ff;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,0.08);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .app-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+  }
+
+  .app-header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .app-header h1 span { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 4px;
+  }
+
+  .nav-links button {
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all 0.15s;
+    font-family: var(--font);
+  }
+
+  .nav-links button:hover { background: var(--bg); color: var(--text); }
+  .nav-links button.active { background: var(--accent-bg); color: var(--accent); font-weight: 600; }
+
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 80px;
+  }
+
+  /* ── Dashboard ── */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+
+  .stat-card .stat-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-card .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    margin-top: 4px;
+    line-height: 1;
+  }
+
+  .stat-card .stat-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .stat-card.accent .stat-value { color: var(--accent); }
+  .stat-card.green .stat-value { color: var(--green); }
+  .stat-card.blue .stat-value { color: var(--blue); }
+
+  .breakdown-bar {
+    display: flex;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 8px;
+    background: var(--border);
+  }
+
+  .breakdown-bar .seg { transition: width 0.3s; }
+  .seg.vocab { background: var(--blue); }
+  .seg.grammar { background: var(--accent); }
+  .seg.phrase { background: var(--green); }
+
+  .breakdown-labels {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .breakdown-labels span { display: flex; align-items: center; gap: 4px; }
+  .breakdown-labels .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  .type-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .type-filters button {
+    padding: 6px 16px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font);
+    color: var(--text-secondary);
+  }
+
+  .type-filters button:hover { border-color: var(--text-secondary); }
+  .type-filters button.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+  /* ── Activity Chart ── */
+  .activity-chart {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-top: 16px;
+  }
+
+  .activity-chart h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+  }
+
+  .chart-grid {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+    height: 60px;
+  }
+
+  .chart-bar {
+    flex: 1;
+    background: var(--accent);
+    border-radius: 2px 2px 0 0;
+    min-height: 2px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+
+  .chart-bar:hover { opacity: 1; }
+
+  /* ── Counter ── */
+  .review-counter {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    padding: 8px;
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+
+  /* ── Card ── */
+  .card-container {
+    perspective: 1000px;
+    margin-bottom: 16px;
+    cursor: pointer;
+  }
+
+  .card-flipper {
+    position: relative;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+    min-height: 280px;
+  }
+
+  .card-flipper.flipped { transform: rotateX(180deg); }
+
+  .card-side {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    backface-visibility: hidden;
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 280px;
+  }
+
+  .card-back {
+    transform: rotateX(180deg);
+  }
+
+  .card-side .card-type-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .card-side .card-type-badge.vocab { background: var(--blue-bg); color: var(--blue); }
+  .card-side .card-type-badge.grammar { background: var(--accent-bg); color: var(--accent); }
+  .card-side .card-type-badge.phrase { background: var(--green-bg); color: var(--green); }
+
+  .card-side .card-category {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .card-front-text {
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+
+  .card-front-pinyin {
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+  }
+
+  .card-front-hint {
+    font-size: 13px;
+    color: var(--text-secondary);
+    opacity: 0.6;
+    margin-top: 16px;
+  }
+
+  .card-back-text {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.5;
+    max-width: 100%;
+    white-space: pre-wrap;
+  }
+
+  .card-back-text strong {
+    color: var(--accent);
+  }
+
+  .card-back-text blockquote {
+    margin: 6px 0;
+    padding: 4px 10px;
+    border-left: 3px solid var(--accent);
+    color: var(--text-secondary);
+    font-size: 15px;
+    text-align: left;
+    font-style: normal;
+  }
+
+  .card-back-text code {
+    background: var(--accent-bg);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.85em;
+  }
+
+  .card-back-detail {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 12px;
+  }
+
+  .card-back .source-info {
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  /* ── Rating Buttons ── */
+  .rating-section {
+    display: none;
+    margin-bottom: 16px;
+  }
+
+  .rating-section.visible { display: block; }
+
+  .rating-label {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .rating-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .rating-btn {
+    flex: 1;
+    padding: 12px 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    font-family: var(--font);
+  }
+
+  .rating-btn:hover { border-color: var(--text); transform: translateY(-1px); }
+  .rating-btn:active { transform: translateY(0); }
+
+  .rating-btn .r-num {
+    font-size: 18px;
+    font-weight: 700;
+    display: block;
+  }
+
+  .rating-btn .r-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    display: block;
+    margin-top: 2px;
+  }
+
+  .rating-btn.r-0:hover { border-color: var(--red); background: var(--red-bg); }
+  .rating-btn.r-1:hover { border-color: var(--red); background: var(--red-bg); }
+  .rating-btn.r-2:hover { border-color: var(--yellow); background: var(--yellow-bg); }
+  .rating-btn.r-3:hover { border-color: var(--yellow); background: var(--yellow-bg); }
+  .rating-btn.r-4:hover { border-color: var(--green); background: var(--green-bg); }
+  .rating-btn.r-5:hover { border-color: var(--green); background: var(--green-bg); }
+
+  .rating-btn .r-num.r-0 { color: var(--red); }
+  .rating-btn .r-num.r-1 { color: var(--red); }
+  .rating-btn .r-num.r-2 { color: var(--yellow); }
+  .rating-btn .r-num.r-3 { color: var(--yellow); }
+  .rating-btn .r-num.r-4 { color: var(--green); }
+  .rating-btn .r-num.r-5 { color: var(--green); }
+
+  /* ── Empty State ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+  }
+
+  .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-state h2 { font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+  .empty-state p { font-size: 14px; line-height: 1.6; }
+
+  .empty-state .new-cards-link {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 8px 20px;
+    background: var(--accent);
+    color: white;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    font-family: var(--font);
+  }
+
+  .empty-state .new-cards-link:hover { opacity: 0.9; }
+
+  /* ── Review Complete ── */
+  .review-complete {
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .review-complete .icon { font-size: 56px; margin-bottom: 12px; }
+  .review-complete h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+  .review-complete p { color: var(--text-secondary); font-size: 14px; }
+
+  /* ── Card Browser ── */
+  .browser-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .browser-controls input {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: var(--font);
+    background: var(--surface);
+  }
+
+  .browser-controls input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-bg);
+  }
+
+  .browser-controls select {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: var(--font);
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  .browser-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .browser-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+
+  .browser-item:hover { border-color: var(--accent); }
+
+  .browser-item .item-type {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .browser-item .item-type.vocab { background: var(--blue-bg); color: var(--blue); }
+  .browser-item .item-type.grammar { background: var(--accent-bg); color: var(--accent); }
+  .browser-item .item-type.phrase { background: var(--green-bg); color: var(--green); }
+
+  .browser-item .item-front {
+    font-size: 18px;
+    font-weight: 600;
+    min-width: 60px;
+  }
+
+  .browser-item .item-back {
+    font-size: 13px;
+    color: var(--text-secondary);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .browser-item .item-status {
+    font-size: 11px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .browser-item .item-status.learned { color: var(--green); }
+  .browser-item .item-status.due { color: var(--accent); }
+
+  /* ── Sections ── */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── Responsive ── */
+  @media (max-width: 500px) {
+    .dashboard-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat-card { padding: 12px; }
+    .stat-card .stat-value { font-size: 24px; }
+    .card-front-text { font-size: 32px; }
+    .rating-btn { padding: 8px 4px; }
+    .rating-btn .r-num { font-size: 14px; }
+    .rating-btn .r-label { font-size: 10px; }
+    .app-header { padding: 10px 12px; }
+    .app-header h1 { font-size: 15px; }
+    .nav-links button { padding: 6px 10px; font-size: 12px; }
+    main { padding: 16px 12px 80px; }
+    .browser-controls { flex-direction: column; }
+    .browser-controls input { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1><span>中</span>文 · SRS</h1>
+  <div class="nav-links">
+    <button class="active" data-section="dashboard">Dashboard</button>
+    <button data-section="review">Review</button>
+    <button data-section="browse">Browse</button>
+  </div>
+</div>
+
+<main>
+
+  <!-- ═══ DASHBOARD ═══ -->
+  <div id="section-dashboard" class="section active">
+    <div class="dashboard-grid" id="dashboardStats">
+      <div class="stat-card accent">
+        <div class="stat-label">Due Today</div>
+        <div class="stat-value" id="statDue">—</div>
+        <div class="stat-sub" id="statDueSub"></div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Reviewed Today</div>
+        <div class="stat-value" id="statReviewed">—</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Total Cards</div>
+        <div class="stat-value" id="statTotal">—</div>
+        <div class="stat-sub" id="statNewSub"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Due This Week</div>
+        <div class="stat-value" id="statWeek">—</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Cards by Type</div>
+      <div class="breakdown-bar" id="breakdownBar"></div>
+      <div class="breakdown-labels" id="breakdownLabels"></div>
+    </div>
+
+    <div class="activity-chart">
+      <h3>Review Activity (30 days)</h3>
+      <div class="chart-grid" id="activityChart"></div>
+    </div>
+  </div>
+
+  <!-- ═══ REVIEW ═══ -->
+  <div id="section-review" class="section">
+    <div class="review-counter" id="reviewCounter"></div>
+
+    <div class="type-filters">
+      <button class="active" data-review-type="all">All</button>
+      <button data-review-type="vocab">Vocab</button>
+      <button data-review-type="grammar">Grammar</button>
+      <button data-review-type="phrase">Phrases</button>
+    </div>
+
+    <div id="reviewContent">
+      <!-- Filled by JS -->
+    </div>
+
+    <div class="rating-section" id="ratingSection">
+      <div class="rating-label">How well did you know it?</div>
+      <div class="rating-buttons">
+        <button class="rating-btn r-0" data-quality="0">
+          <span class="r-num r-0">0</span>
+          <span class="r-label">Forgot</span>
+        </button>
+        <button class="rating-btn r-1" data-quality="1">
+          <span class="r-num r-1">1</span>
+          <span class="r-label">Hard</span>
+        </button>
+        <button class="rating-btn r-2" data-quality="2">
+          <span class="r-num r-2">2</span>
+          <span class="r-label">Hesitant</span>
+        </button>
+        <button class="rating-btn r-3" data-quality="3">
+          <span class="r-num r-3">3</span>
+          <span class="r-label">OK</span>
+        </button>
+        <button class="rating-btn r-4" data-quality="4">
+          <span class="r-num r-4">4</span>
+          <span class="r-label">Good</span>
+        </button>
+        <button class="rating-btn r-5" data-quality="5">
+          <span class="r-num r-5">5</span>
+          <span class="r-label">Perfect</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ BROWSE ═══ -->
+  <div id="section-browse" class="section">
+    <div class="browser-controls">
+      <input type="text" id="browserSearch" placeholder="Search Chinese, pinyin, or meaning...">
+      <select id="browserType">
+        <option value="">All types</option>
+        <option value="vocab">Vocab</option>
+        <option value="grammar">Grammar</option>
+        <option value="phrase">Phrases</option>
+      </select>
+    </div>
+    <div id="browserCount" style="font-size:12px;color:var(--text-secondary);margin-bottom:8px"></div>
+    <div class="browser-list" id="browserList"></div>
+    <div id="browserEmpty" class="empty-state" style="display:none">
+      <div class="icon">🔍</div>
+      <h2>No cards found</h2>
+      <p>Try a different search term or filter.</p>
+    </div>
+    <button id="browserLoadMore" style="display:none;margin:16px auto;padding:8px 24px;background:var(--accent);color:white;border:none;border-radius:var(--radius-sm);cursor:pointer;font-family:var(--font);font-weight:500" onclick="loadBrowseMore()">Load more</button>
+  </div>
+
+</main>
+
+<script>
+// ─── State ──────────────────────────────────────────────────────────────────
+let state = {
+  cards: [],
+  currentIndex: 0,
+  mode: 'due',             // 'due' or 'new'
+  reviewType: 'all',
+  isFlipped: false,
+  isSubmitting: false,
+};
+
+// ─── Markdown renderer ──────────────────────────────────────────────────────
+function renderMarkdown(text) {
+  // Escape HTML entities first to prevent injection
+  let html = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  // Process line-by-line for blockquote handling
+  const lines = html.split('\n');
+  const out = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    const isQuote = line.startsWith('&gt;');
+
+    if (isQuote) {
+      // Strip the leading &gt;  prefix
+      line = line.replace(/^&gt;\s?/, '');
+      // Apply inline formatting, then wrap in blockquote
+      line = renderInline(line);
+      out.push('<blockquote>' + line + '</blockquote>');
+    } else {
+      out.push(renderInline(line));
+    }
+  }
+
+  return out.join('\n');
+}
+
+function renderInline(str) {
+  return str
+    // **bold**
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // `inline code`
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // markdown line break: two trailing spaces
+    .replace(/  $/gm, '<br>');
+}
+
+// ─── Navigation ─────────────────────────────────────────────────────────────
+document.querySelectorAll('.nav-links button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('section-' + btn.dataset.section).classList.add('active');
+
+    if (btn.dataset.section === 'dashboard') loadDashboard();
+    if (btn.dataset.section === 'review') loadReview();
+    if (btn.dataset.section === 'browse') { browseOffset = 0; loadBrowse(false); }
+  });
+});
+
+// ─── API helpers ────────────────────────────────────────────────────────────
+async function api(url, opts = {}) {
+  const res = await fetch(url, {
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    ...opts,
+  });
+  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  return res.json();
+}
+
+// ─── Dashboard ──────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  const data = await api('/api/stats');
+  document.getElementById('statDue').textContent = data.due_today || 0;
+  document.getElementById('statDueSub').textContent = `${data.vocab_due || 0} vocab · ${data.grammar_due || 0} grammar · ${data.phrase_due || 0} phrases`;
+  document.getElementById('statReviewed').textContent = data.reviewed_today || 0;
+  document.getElementById('statTotal').textContent = data.total_active || 0;
+  document.getElementById('statNewSub').textContent = `${data.new_cards || 0} new cards`;
+  document.getElementById('statWeek').textContent = data.due_week || 0;
+
+  // Breakdown bar
+  const total = (data.vocab_count || 0) + (data.grammar_count || 0) + (data.phrase_count || 0) || 1;
+  const vPct = ((data.vocab_count || 0) / total * 100).toFixed(1);
+  const gPct = ((data.grammar_count || 0) / total * 100).toFixed(1);
+  const pPct = ((data.phrase_count || 0) / total * 100).toFixed(1);
+
+  document.getElementById('breakdownBar').innerHTML = `
+    <div class="seg vocab" style="width:${vPct}%"></div>
+    <div class="seg grammar" style="width:${gPct}%"></div>
+    <div class="seg phrase" style="width:${pPct}%"></div>
+  `;
+
+  document.getElementById('breakdownLabels').innerHTML = `
+    <span><span class="dot" style="background:var(--blue)"></span> Vocab ${data.vocab_count || 0}</span>
+    <span><span class="dot" style="background:var(--accent)"></span> Grammar ${data.grammar_count || 0}</span>
+    <span><span class="dot" style="background:var(--green)"></span> Phrases ${data.phrase_count || 0}</span>
+  `;
+
+  // Activity chart
+  const act = await api('/api/activity?days=30');
+  const chart = document.getElementById('activityChart');
+  const values = Object.values(act.activity || {}).map(v => v.reviews);
+  const max = Math.max(...values, 1);
+
+  chart.innerHTML = Object.entries(act.activity || {}).map(([day, val]) => {
+    const pct = Math.max(2, (val.reviews / max) * 100);
+    return `<div class="chart-bar" style="height:${pct}%" title="${day}: ${val.reviews} reviews"></div>`;
+  }).join('');
+}
+
+// ─── Review ─────────────────────────────────────────────────────────────────
+async function loadReview() {
+  const filter = state.reviewType;
+  const typeParam = filter !== 'all' ? `&type=${filter}` : '';
+
+  // Try due cards first
+  let data = await api(`/api/review/next?limit=20${typeParam}`);
+  let cards = data.cards || [];
+
+  // If no due cards, get new cards
+  if (cards.length === 0) {
+    state.mode = 'new';
+    data = await api(`/api/review/new?limit=20${typeParam}`);
+    cards = data.cards || [];
+    if (cards.length === 0) {
+      showReviewComplete();
+      return;
+    }
+  } else {
+    state.mode = 'due';
+  }
+
+  state.cards = cards;
+  state.currentIndex = 0;
+  state.isFlipped = false;
+  showCard();
+}
+
+function showReviewComplete() {
+  const el = document.getElementById('reviewContent');
+  el.innerHTML = `
+    <div class="review-complete">
+      <div class="icon">🎉</div>
+      <h2>All caught up!</h2>
+      <p>No cards due for review right now. Come back later or try a different card type.</p>
+    </div>
+  `;
+  document.getElementById('ratingSection').classList.remove('visible');
+  document.getElementById('reviewCounter').textContent = '';
+}
+
+function showCard() {
+  const el = document.getElementById('reviewContent');
+  const total = state.cards.length;
+  const idx = state.currentIndex;
+
+  if (idx >= total) {
+    // Session complete
+    const doneEl = document.getElementById('reviewContent');
+    doneEl.innerHTML = `
+      <div class="review-complete">
+        <div class="icon">✅</div>
+        <h2>Session complete!</h2>
+        <p>You reviewed all ${total} cards in this batch.</p>
+        <div style="margin-top:12px">
+          <button class="new-cards-link" onclick="loadReview()">Review Again</button>
+          <button class="new-cards-link" style="background:var(--blue);margin-left:8px" onclick="switchSection('dashboard')">Dashboard</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('ratingSection').classList.remove('visible');
+    document.getElementById('reviewCounter').textContent = '';
+    return;
+  }
+
+  const card = state.cards[idx];
+  state.isFlipped = false;
+
+  const typeLabel = { vocab: 'Vocab', grammar: 'Grammar', phrase: 'Phrase' }[card.card_type] || card.card_type;
+  const typeBadge = card.card_type;
+
+  // Source info
+  let sourceInfo = '';
+  if (card.source_day && card.source_day > 0) {
+    sourceInfo = `Day ${card.source_day}`;
+    if (card.theme) sourceInfo += ` · ${card.theme}`;
+  }
+
+  let frontPinyin = '';
+  if (card.card_type === 'vocab' && card.pinyin) {
+    frontPinyin = `<div class="card-front-pinyin">${card.pinyin}</div>`;
+  }
+
+  let backDetail = '';
+  if (card.card_type === 'grammar') {
+    const lines = card.back.split('\n').filter(l => l.trim().startsWith('-'));
+    if (lines.length > 0) {
+      backDetail = `<div class="card-back-detail">${renderMarkdown(lines.slice(0, 3).join('<br>'))}</div>`;
+    }
+  }
+
+  el.innerHTML = `
+    <div class="card-container" onclick="flipCard()">
+      <div class="card-flipper" id="cardFlipper">
+        <div class="card-side card-front">
+          <span class="card-type-badge ${typeBadge}">${typeLabel}</span>
+          <span class="card-category">${sourceInfo}</span>
+          <div class="card-front-text">${card.front}</div>
+          ${frontPinyin}
+          <div class="card-front-hint">Tap to reveal</div>
+        </div>
+        <div class="card-side card-back">
+          <span class="card-type-badge ${typeBadge}">${typeLabel}</span>
+          <span class="card-category">${sourceInfo}</span>
+          <div class="card-back-text">${renderMarkdown(card.back)}</div>
+          ${backDetail}
+          <div class="source-info">
+            Repetitions: ${card.repetitions || 0} · Interval: ${card.interval || 0}d
+            ${card.category ? ` · ${card.category}` : ''}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('reviewCounter').textContent =
+    `Card ${idx + 1} of ${total} · ${state.mode === 'due' ? 'Review' : 'New'}`;
+
+  document.getElementById('ratingSection').classList.remove('visible');
+}
+
+function flipCard() {
+  if (state.isSubmitting) return;
+  state.isFlipped = !state.isFlipped;
+  document.getElementById('cardFlipper').classList.toggle('flipped', state.isFlipped);
+  document.getElementById('ratingSection').classList.toggle('visible', state.isFlipped);
+}
+
+async function submitRating(quality) {
+  if (state.isSubmitting) return;
+  state.isSubmitting = true;
+
+  const card = state.cards[state.currentIndex];
+
+  try {
+    await api('/api/review', {
+      method: 'POST',
+      body: JSON.stringify({ card_id: card.id, quality }),
+    });
+
+    state.currentIndex++;
+    state.isSubmitting = false;
+    showCard();
+  } catch (e) {
+    console.error('Submit failed:', e);
+    state.isSubmitting = false;
+  }
+}
+
+// Rating buttons
+document.querySelector('.rating-buttons')?.addEventListener('click', e => {
+  const btn = e.target.closest('.rating-btn');
+  if (btn) submitRating(parseInt(btn.dataset.quality));
+});
+
+// Type filters for review
+document.querySelectorAll('[data-review-type]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-review-type]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.reviewType = btn.dataset.reviewType;
+    loadReview();
+  });
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('section-review').classList.contains('active')) return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+  if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    if (!state.isFlipped) {
+      flipCard();
+    }
+  }
+
+  if (state.isFlipped) {
+    const num = parseInt(e.key);
+    if (num >= 0 && num <= 5) {
+      submitRating(num);
+    }
+  }
+});
+
+// ─── Browse ─────────────────────────────────────────────────────────────────
+let browseTimeout = null;
+
+const BROWSE_LIMIT = 100;
+let browseOffset = 0;
+
+async function loadBrowse(append) {
+  const search = document.getElementById('browserSearch').value;
+  const type = document.getElementById('browserType').value;
+  const params = new URLSearchParams({ limit: BROWSE_LIMIT, offset: browseOffset });
+  if (search) params.set('search', search);
+  if (type) params.set('type', type);
+
+  const data = await api(`/api/cards?${params}`);
+  const list = document.getElementById('browserList');
+  const empty = document.getElementById('browserEmpty');
+  const countEl = document.getElementById('browserCount');
+  const moreBtn = document.getElementById('browserLoadMore');
+
+  if (!data.cards || data.cards.length === 0) {
+    if (!append) { list.innerHTML = ''; }
+    empty.style.display = list.innerHTML ? 'none' : 'block';
+    countEl.textContent = data.count ? `${data.count} cards found` : '';
+    moreBtn.style.display = 'none';
+    return;
+  }
+
+  empty.style.display = 'none';
+
+  const today = new Date().toISOString().split('T')[0];
+
+  const html = data.cards.map(c => {
+    const typeLabel = { vocab: 'Vocab', grammar: 'Grammar', phrase: 'Phrase' }[c.card_type] || c.card_type;
+    let status = '';
+    if (c.repetitions === 0) status = '<span class="item-status">New</span>';
+    else if (c.next_review <= today) status = '<span class="item-status due">Due</span>';
+    else status = `<span class="item-status learned">Learned</span>`;
+
+    return `
+      <div class="browser-item" onclick="viewCard(${c.id})">
+        <span class="item-type ${c.card_type}">${typeLabel}</span>
+        <span class="item-front">${c.front}</span>
+        <span class="item-back">${renderMarkdown(c.back)}</span>
+        ${status}
+      </div>
+    `;
+  }).join('');
+
+  if (append) {
+    list.innerHTML += html;
+  } else {
+    list.innerHTML = html;
+  }
+
+  browseOffset += data.cards.length;
+  const total = data.count || data.total;
+  countEl.textContent = `${browseOffset} of ${total} cards shown`;
+  moreBtn.style.display = browseOffset < total ? 'block' : 'none';
+}
+
+function loadBrowseMore() {
+  loadBrowse(true);
+}
+
+document.getElementById('browserSearch').addEventListener('input', () => {
+  clearTimeout(browseTimeout);
+  browseOffset = 0;
+  browseTimeout = setTimeout(() => loadBrowse(false), 300);
+});
+
+document.getElementById('browserType').addEventListener('change', () => {
+  browseOffset = 0;
+  loadBrowse(false);
+});
+
+async function viewCard(id) {
+  const data = await api(`/api/card/${id}`);
+  // Switch to review section with this card
+  document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+  document.querySelector('[data-section="review"]').classList.add('active');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-review').classList.add('active');
+
+  state.cards = [data];
+  state.currentIndex = 0;
+  state.isFlipped = false;
+  state.mode = 'due';
+  showCard();
+}
+
+function switchSection(name) {
+  document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-section="${name}"]`).classList.add('active');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(`section-${name}`).classList.add('active');
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'review') loadReview();
+  if (name === 'browse') { browseOffset = 0; loadBrowse(false); }
+}
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+loadDashboard();
+</script>
+</body>
+</html>
