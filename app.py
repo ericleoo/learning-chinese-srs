@@ -134,7 +134,7 @@ def api_review_next():
         query += " AND card_type = ?"
         params.append(card_type)
     
-    query += " ORDER BY next_review ASC, repetitions ASC LIMIT ?"
+    query += " ORDER BY RANDOM() LIMIT ?"
     params.append(limit)
     
     rows = conn.execute(query, params).fetchall()
@@ -174,7 +174,7 @@ def api_review_new():
         query += " AND card_type = ?"
         params.append(card_type)
     
-    query += " ORDER BY source_day ASC LIMIT ?"
+    query += " ORDER BY RANDOM() LIMIT ?"
     params.append(limit)
     
     rows = conn.execute(query, params).fetchall()
