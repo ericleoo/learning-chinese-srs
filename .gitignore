@@ -1,5 +1,5 @@
 # Database (generated)
-#data/srs.db
+data/srs.db
 
 # Python virtual environment
 .venv/
