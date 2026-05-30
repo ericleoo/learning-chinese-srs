@@ -917,13 +917,29 @@ function showCard() {
     `Card ${idx + 1} of ${total} · ${state.mode === 'due' ? 'Review' : 'New'}`;
 
   document.getElementById('ratingSection').classList.remove('visible');
+
+  // Set initial height to match front side content
+  requestAnimationFrame(() => {
+    const flipper = document.getElementById('cardFlipper');
+    const front = flipper.querySelector('.card-front');
+    if (front) flipper.style.height = front.scrollHeight + 'px';
+  });
 }
 
 function flipCard() {
   if (state.isSubmitting) return;
   state.isFlipped = !state.isFlipped;
-  document.getElementById('cardFlipper').classList.toggle('flipped', state.isFlipped);
+  const flipper = document.getElementById('cardFlipper');
+  flipper.classList.toggle('flipped', state.isFlipped);
   document.getElementById('ratingSection').classList.toggle('visible', state.isFlipped);
+
+  // Resize container to match the now-visible side
+  requestAnimationFrame(() => {
+    const activeSide = state.isFlipped
+      ? flipper.querySelector('.card-back')
+      : flipper.querySelector('.card-front');
+    flipper.style.height = activeSide.scrollHeight + 'px';
+  });
 }
 
 async function submitRating(quality) {
