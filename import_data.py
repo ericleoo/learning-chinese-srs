@@ -41,9 +41,17 @@ def parse_new_vocab(content):
     # Find the header separator line to determine column count
     header_sep = None
     for i, line in enumerate(lines):
-        if line.strip().startswith("|---") or line.strip().startswith("|----"):
+        sl = line.strip()
+        if sl.startswith("|---") or sl.startswith("|----"):
             header_sep = i
             break
+        # Also handle space-padded separators: | --- |, | --------- |
+        if sl.startswith("|") and re.search(r"\|[ -]+\|", sl):
+            parts = [c.strip() for c in sl.split("|")]
+            parts = [c for c in parts if c]
+            if len(parts) >= 1 and all(re.match(r"^-+$", p) for p in parts):
+                header_sep = i
+                break
     
     if header_sep is None:
         return vocab
@@ -292,14 +300,15 @@ def upsert_card(cursor, card_type, front, back, pinyin, category, source_day, th
     """Insert a card, or update its content fields if it already exists.
     
     Preserves SRS state (easiness, interval, repetitions, next_review) on conflict.
-    Keeps the FIRST back/meaning so earlier definitions aren't lost.
+    Exercise-file meanings (back) always replace COVERED.md placeholders.
     """
     cursor.execute("""
         INSERT INTO cards (card_type, front, back, pinyin, category, source_day, theme)
         VALUES (?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(card_type, front) DO UPDATE SET
-            pinyin        = CASE WHEN cards.pinyin = '' THEN excluded.pinyin ELSE cards.pinyin END,
-            source_day    = CASE WHEN cards.source_day = 0 THEN excluded.source_day ELSE cards.source_day END,
+            back          = excluded.back,
+            pinyin        = excluded.pinyin,
+            source_day    = excluded.source_day,
             category      = excluded.category,
             theme         = excluded.theme,
             is_active     = 1
