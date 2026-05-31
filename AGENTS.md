@@ -37,7 +37,14 @@ This is safe to run any time:
 - **New cards** are added for new vocabulary/grammar/phrases
 - **Existing cards** have their content fields (meaning, pinyin, theme) refreshed
 - **SRS state** (easiness, interval, repetitions, next_review) is **never touched**
+- **Removed cards** from rewritten exercises are deactivated (`is_active = 0`) — see note below
 - If the Learning-Chinese directory is elsewhere, pass the path as an argument
+
+> **Exercise rewrites**: If an exercise file is rewritten (e.g. the student changes the theme),
+> any card that was originally sourced from that exercise but is no longer in its content
+> will be **deactivated** (not deleted). This keeps the DB in sync without losing data.
+> Deactivated cards are hidden from review but remain in the database for recovery.
+> To restore a deactivated card, set `is_active = 1` manually or re-add it to an exercise.
 
 ### 3. When Modifying the Parser
 
@@ -63,6 +70,7 @@ curl -X POST http://localhost:5000/api/reset \
 
 - Card keys are `(card_type, front)` — this is the unique constraint for upsert
 - `card_type` is one of: `vocab`, `grammar`, `phrase`
+- `is_active` controls whether a card appears in reviews (1 = active, 0 = deactivated)
 - SM-2 easiness factor is clamped to ≥ 1.3
 - Failed reviews (quality < 3) reset interval to 1 day and repetitions to 0
 - The `upsert_card()` helper preserves SRS columns on conflict
@@ -88,5 +96,11 @@ None yet. The project is small enough that `uv run import_data.py` and `uv run a
 - **Single-file frontend**: Everything is in `index.html`. No build step, no npm. Easy to tweak.
 - **No ORM**: Raw SQLite + Flask. Simple and transparent.
 - **Incremental import**: Deleting and re-inserting all cards would wipe SRS state. The upsert approach (`ON CONFLICT DO UPDATE SET back/pinyin/category/theme...`) is intentional.
+- **Exercise rewrites**: After each exercise is processed, cards with `source_day == current_day` that
+  are no longer in that exercise's content get deactivated (`is_active = 0`). This handles the common
+  scenario where a student rewrites the latest exercise because the theme wasn't relevant.
+  Cards from earlier exercises keep their `source_day` even if they also appear in a later exercise
+  (the global `seen` set ensures first-source attribution), so rewriting a later exercise does not
+  affect cards introduced earlier. Deactivated cards remain in the database with SRS state intact.
 - **Markdown rendering**: Grammar card backs contain markdown (`**bold**`, `> blockquotes`). `renderMarkdown()` in the frontend handles this.
 - **No authentication**: Runs on localhost only. The WARNING about development server is expected — this is a personal tool.

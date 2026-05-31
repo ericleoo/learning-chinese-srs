@@ -316,14 +316,25 @@ def upsert_card(cursor, card_type, front, back, pinyin, category, source_day, th
 
 
 def import_exercises(conn):
-    """Parse all exercise files and populate the database."""
+    """Parse all exercise files and populate the database.
+
+    When an exercise file is rewritten (e.g. a student changes the theme),
+    cards that previously belonged to that exercise but are no longer in its
+    content are deactivated (is_active = 0). This keeps the database in sync
+    with the current exercise files without ever deleting data.
+    """
     cursor = conn.cursor()
-    
-    # Track seen (card_type, front) pairs to skip intra-file duplicates
-    seen = set()
     
     files = get_exercise_files()
     print(f"Found {len(files)} exercise files")
+    
+    # Track (card_type, front) pairs already seen across all files so far.
+    # When a card appears in multiple exercises, the EARLIEST exercise wins
+    # for source attribution. This prevents later exercises from claiming a
+    # card and then having it deactivated when that later exercise is rewritten.
+    seen = set()
+    
+    total_deactivated = 0
     
     for day_num, filepath in files:
         with open(filepath, "r", encoding="utf-8") as f:
@@ -337,9 +348,16 @@ def import_exercises(conn):
             (day_num, theme),
         )
         
+        # Track which (card_type, front) pairs this exercise currently produces.
+        # After upserting, any active card with source_day == day_num that is
+        # NOT in this set will be deactivated — this handles exercise rewrites
+        # (e.g. when a student changes the theme and regenerates the file).
+        day_keys = set()
+        
         # Vocabulary
         for char, pinyin, meaning in parse_new_vocab(content):
             key = ("vocab", char)
+            day_keys.add(key)
             if key not in seen:
                 seen.add(key)
                 upsert_card(cursor, "vocab", char, meaning, pinyin, theme, day_num, theme)
@@ -347,6 +365,7 @@ def import_exercises(conn):
         # Grammar patterns
         for title, body in parse_grammar_patterns(content, day_num):
             key = ("grammar", title)
+            day_keys.add(key)
             if key not in seen:
                 seen.add(key)
                 back = title
@@ -363,16 +382,43 @@ def import_exercises(conn):
         # Useful phrases
         for chinese, english in parse_useful_phrases(content):
             key = ("phrase", chinese)
+            day_keys.add(key)
             if key not in seen:
                 seen.add(key)
                 upsert_card(cursor, "phrase", chinese, english, "", theme, day_num, theme)
+        
+        # Deactivate cards that previously belonged to this exercise day but
+        # are no longer in its content (exercise was rewritten).
+        # Only affects cards whose source_day matches the current day, so a
+        # card that appeared in an earlier exercise first is safe even if it
+        # appears in a later exercise's day_keys as well.
+        existing = cursor.execute(
+            "SELECT card_type, front FROM cards WHERE source_day = ? AND is_active = 1",
+            (day_num,),
+        ).fetchall()
+        
+        deactivated = 0
+        for card_type, front in existing:
+            if (card_type, front) not in day_keys:
+                cursor.execute(
+                    "UPDATE cards SET is_active = 0 WHERE card_type = ? AND front = ? AND source_day = ?",
+                    (card_type, front, day_num),
+                )
+                deactivated += 1
+        
+        if deactivated:
+            print(f"  Day {day_num}: deactivated {deactivated} card(s) removed from rewritten exercise")
+        total_deactivated += deactivated
     
     conn.commit()
     
     # Report
-    before = conn.execute("SELECT COUNT(*) FROM cards").fetchone()[0]
-    print(f"  Existing cards preserved: {before}")
-    print(f"  Cards now in DB: {cursor.execute('SELECT COUNT(*) FROM cards').fetchone()[0]}")
+    total = cursor.execute("SELECT COUNT(*) FROM cards").fetchone()[0]
+    active = cursor.execute("SELECT COUNT(*) FROM cards WHERE is_active = 1").fetchone()[0]
+    print(f"  Active cards: {active}")
+    print(f"  Total cards (incl. deactivated): {total}")
+    if total_deactivated:
+        print(f"  Deactivated this run: {total_deactivated}")
 
 
 def insert_if_missing(cursor, card_type, front, back, pinyin, category, source_day, theme):
