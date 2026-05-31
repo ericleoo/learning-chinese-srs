@@ -115,27 +115,34 @@ def api_stats():
 
 @app.route("/api/review/next")
 def api_review_next():
-    """Get the next card due for review."""
+    """Get the next card due for review.
+    
+    Returns a mixed batch: reviewed cards (due/overdue) first, ordered by
+    urgency, then new cards to fill remaining slots. This ensures failed
+    cards surface immediately while new cards remain discoverable.
+    """
     conn = get_db()
     today = date.today().isoformat()
     
     card_type = request.args.get("type", "")
-    limit = min(int(request.args.get("limit", 1)), 20)
+    limit = min(int(request.args.get("limit", 1)), 50)
     
-    query = """
-        SELECT * FROM cards 
-        WHERE next_review <= ? AND is_active = 1
-    """
-    params = [today]
+    base_where = "WHERE next_review <= ? AND is_active = 1"
+    base_params = [today]
+    type_clause = ""
+    type_params = []
     
     if card_type in ("vocab", "grammar", "phrase"):
-        query += " AND card_type = ?"
-        params.append(card_type)
+        type_clause = " AND card_type = ?"
+        type_params = [card_type]
     
-    query += " ORDER BY RANDOM() LIMIT ?"
-    params.append(limit)
-    
-    rows = conn.execute(query, params).fetchall()
+    # 1) Fetch reviewed cards due/overdue — these are the priority
+    rows = conn.execute(f"""
+        SELECT * FROM cards {base_where}{type_clause}
+        AND last_reviewed IS NOT NULL
+        ORDER BY next_review ASC, easiness ASC, repetitions ASC
+        LIMIT ?
+    """, base_params + type_params + [limit]).fetchall()
     
     cards = []
     for row in rows:
@@ -153,6 +160,32 @@ def api_review_next():
             "repetitions": row["repetitions"],
             "next_review": row["next_review"],
         })
+    
+    # 2) Fill remaining slots with new cards (never reviewed)
+    remaining = limit - len(cards)
+    if remaining > 0:
+        rows = conn.execute(f"""
+            SELECT * FROM cards {base_where}{type_clause}
+            AND last_reviewed IS NULL
+            ORDER BY next_review ASC
+            LIMIT ?
+        """, base_params + type_params + [remaining]).fetchall()
+        
+        for row in rows:
+            cards.append({
+                "id": row["id"],
+                "card_type": row["card_type"],
+                "front": row["front"],
+                "back": row["back"],
+                "pinyin": row["pinyin"],
+                "category": row["category"],
+                "theme": row["theme"],
+                "source_day": row["source_day"],
+                "easiness": row["easiness"],
+                "interval": row["interval"],
+                "repetitions": row["repetitions"],
+                "next_review": row["next_review"],
+            })
     
     conn.close()
     return jsonify({"cards": cards, "count": len(cards)})

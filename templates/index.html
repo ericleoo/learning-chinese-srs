@@ -1039,21 +1039,10 @@ function showCard() {
   const idx = state.currentIndex;
 
   if (idx >= total) {
-    // Session complete
-    const doneEl = document.getElementById('reviewContent');
-    doneEl.innerHTML = `
-      <div class="review-complete">
-        <div class="icon">✅</div>
-        <h2>Session complete!</h2>
-        <p>You reviewed all ${total} cards in this batch.</p>
-        <div style="margin-top:12px">
-          <button class="new-cards-link" onclick="loadReview()">Review Again</button>
-          <button class="new-cards-link" style="background:var(--blue);margin-left:8px" onclick="switchSection('dashboard')">Dashboard</button>
-        </div>
-      </div>
-    `;
+    // Auto-load next batch — keeps draining until truly nothing is due
     document.getElementById('ratingSection').classList.remove('visible');
-    document.getElementById('reviewCounter').textContent = '';
+    document.getElementById('reviewCounter').textContent = 'Loading more cards…';
+    loadReview();
     return;
   }
 
