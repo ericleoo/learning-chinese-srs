@@ -5,7 +5,6 @@ Chinese SRS Review App — Flask backend with SM-2 spaced repetition.
 
 import os
 import sqlite3
-import math
 from datetime import date, timedelta
 from flask import Flask, jsonify, request, render_template
 
@@ -105,7 +104,6 @@ def api_stats():
     ).fetchone()[0]
     
     # Reviews done today
-    yesterday = (date.today() - timedelta(days=1)).isoformat()
     stats["reviewed_today"] = conn.execute(
         "SELECT COUNT(*) FROM cards WHERE last_reviewed = ?",
         (today,),
@@ -279,7 +277,7 @@ def api_list_cards():
         query.replace("SELECT *", "SELECT COUNT(*)"), params
     ).fetchone()[0]
     
-    query += " ORDER BY source_day ASC, front ASC LIMIT ? OFFSET ?"
+    query += " ORDER BY CASE WHEN last_reviewed IS NULL THEN 2 WHEN repetitions = 0 THEN 0 ELSE 1 END, easiness ASC, next_review ASC, front ASC LIMIT ? OFFSET ?"
     params.extend([limit, offset])
     
     rows = conn.execute(query, params).fetchall()
@@ -295,6 +293,7 @@ def api_list_cards():
             "category": row["category"],
             "theme": row["theme"],
             "source_day": row["source_day"],
+            "easiness": row["easiness"],
             "interval": row["interval"],
             "repetitions": row["repetitions"],
             "next_review": row["next_review"],
@@ -391,7 +390,8 @@ def api_review_all_due():
         return jsonify({"error": "reviews array required"}), 400
     
     conn = get_db()
-    today = date.today().isoformat()
+    today = date.today()
+    today_str = today.isoformat()
     results = []
     
     for review in data["reviews"]:
@@ -415,7 +415,7 @@ def api_review_all_due():
             row["easiness"], row["interval"], row["repetitions"], quality
         )
         
-        next_review = date.today() + timedelta(days=interval)
+        next_review = today + timedelta(days=interval)
         
         conn.execute(
             """
@@ -425,7 +425,7 @@ def api_review_all_due():
             WHERE id = ?
             """,
             (round(easiness, 2), interval, repetitions, 
-             next_review.isoformat(), today, card_id),
+             next_review.isoformat(), today_str, card_id),
         )
         
         results.append({
