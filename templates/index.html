@@ -623,6 +623,12 @@
     min-width: 60px;
   }
 
+  .browser-item .item-pinyin {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
   .browser-item .item-back {
     font-size: 13px;
     color: var(--text-secondary);
@@ -631,15 +637,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-
-  .browser-item .item-status {
-    font-size: 11px;
-    color: var(--text-secondary);
-    white-space: nowrap;
-  }
-
-  .browser-item .item-status.learned { color: var(--green); }
-  .browser-item .item-status.due { color: var(--accent); }
 
   /* ── Sections ── */
   .section { display: none; }
@@ -1218,33 +1215,16 @@ async function loadBrowse(append) {
 
   const today = new Date().toISOString().split('T')[0];
 
-  function efClass(ef) {
-    if (ef <= 1.8) return 'due';
-    if (ef <= 2.2) return '';
-    return 'learned';
-  }
-
-  function efLabel(ef) {
-    if (ef <= 1.8) return 'Hard';
-    if (ef <= 2.2) return 'Medium';
-    return 'Easy';
-  }
-
-  function statusHtml(c) {
-    if (c.repetitions === 0) return '<span class="item-status">New</span>';
-    return `<span class="item-status ${efClass(c.easiness)}">${efLabel(c.easiness)} (EF ${c.easiness.toFixed(1)})</span>`;
-  }
-
   const html = data.cards.map(c => {
     const typeLabel = { vocab: 'Vocab', grammar: 'Grammar', phrase: 'Phrase' }[c.card_type] || c.card_type;
-    const status = statusHtml(c);
+    const pinyinHtml = c.card_type === 'vocab' && c.pinyin ? `<span class="item-pinyin">${c.pinyin}</span>` : '';
 
     return `
       <div class="browser-item" onclick="viewCard(${c.id})">
         <span class="item-type ${c.card_type}">${typeLabel}</span>
         <span class="item-front">${c.front}</span>
+        ${pinyinHtml}
         <span class="item-back">${renderMarkdown(c.back)}</span>
-        ${status}
       </div>
     `;
   }).join('');

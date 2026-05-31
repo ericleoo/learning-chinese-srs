@@ -277,7 +277,7 @@ def api_list_cards():
         query.replace("SELECT *", "SELECT COUNT(*)"), params
     ).fetchone()[0]
     
-    query += " ORDER BY CASE WHEN last_reviewed IS NULL THEN 2 WHEN repetitions = 0 THEN 0 ELSE 1 END, easiness ASC, next_review ASC, front ASC LIMIT ? OFFSET ?"
+    query += " ORDER BY CASE WHEN last_reviewed IS NULL THEN 2 WHEN repetitions = 0 THEN 0 ELSE 1 END, easiness ASC, next_review ASC, CASE card_type WHEN 'vocab' THEN 1 WHEN 'grammar' THEN 2 WHEN 'phrase' THEN 3 ELSE 4 END, front ASC LIMIT ? OFFSET ?"
     params.extend([limit, offset])
     
     rows = conn.execute(query, params).fetchall()
