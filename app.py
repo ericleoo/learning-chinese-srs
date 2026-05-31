@@ -140,7 +140,7 @@ def api_review_next():
     rows = conn.execute(f"""
         SELECT * FROM cards {base_where}{type_clause}
         AND last_reviewed IS NOT NULL
-        ORDER BY next_review ASC, easiness ASC, repetitions ASC
+        ORDER BY next_review ASC, easiness ASC, repetitions ASC, RANDOM()
         LIMIT ?
     """, base_params + type_params + [limit]).fetchall()
     
@@ -167,7 +167,7 @@ def api_review_next():
         rows = conn.execute(f"""
             SELECT * FROM cards {base_where}{type_clause}
             AND last_reviewed IS NULL
-            ORDER BY next_review ASC
+            ORDER BY next_review ASC, RANDOM()
             LIMIT ?
         """, base_params + type_params + [remaining]).fetchall()
         
