@@ -303,6 +303,13 @@
     margin-bottom: 4px;
   }
 
+  .card-back-pinyin {
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
   .card-front-hint {
     font-size: 13px;
     color: var(--text-secondary);
@@ -927,9 +934,9 @@ function showCard() {
     if (card.theme) sourceInfo += ` · ${card.theme}`;
   }
 
-  let frontPinyin = '';
+  let backPinyin = '';
   if (card.card_type === 'vocab' && card.pinyin) {
-    frontPinyin = `<div class="card-front-pinyin">${card.pinyin}</div>`;
+    backPinyin = `<div class="card-back-pinyin">${card.pinyin}</div>`;
   }
 
   el.innerHTML = `
@@ -939,12 +946,12 @@ function showCard() {
           <span class="card-type-badge ${typeBadge}">${typeLabel}</span>
           <span class="card-category">${sourceInfo}</span>
           <div class="card-front-text">${card.front}</div>
-          ${frontPinyin}
           <div class="card-front-hint">Tap to reveal</div>
         </div>
         <div class="card-side card-back">
           <span class="card-type-badge ${typeBadge}">${typeLabel}</span>
           <span class="card-category">${sourceInfo}</span>
+          ${backPinyin}
           <div class="card-back-text">${renderMarkdown(card.back)}</div>
           <div class="source-info">
             Repetitions: ${card.repetitions || 0} · Interval: ${card.interval || 0}d
