@@ -10,10 +10,14 @@ This is a separate project from the Learning-Chinese workflow. It reads from the
 
 | File | Purpose |
 |------|---------|
+| File | Purpose |
+|------|---------|
 | `import_data.py` | Parses `daily_exercise_*.md` files and upserts cards into SQLite. Run after every new exercise batch. |
 | `app.py` | Flask server: API endpoints + SM-2 logic. No modifications needed for routine operation. |
 | `templates/index.html` | Single-page frontend (dashboard, review UI, card browser). All JS + CSS inline. |
 | `data/srs.db` | SQLite database (gitignored). Contains cards + themes tables. SRS state lives here. |
+| `data/vocab_lookup.json` | Supplementary pinyin/meaning data for vocab listed only in `COVERED.md` (never in a `## New Vocabulary` table). |
+| `migrate_vocab_lookup.py` | One-time migration to backfill existing cards with data from `vocab_lookup.json`. Run once after adding the file. |
 | `pyproject.toml` | uv project config. Dependencies: flask. |
 
 ## Agent Workflow
@@ -58,6 +62,20 @@ If exercise file formats change (different table layouts, new sections), edit `i
 
 After any parser change, re-run `import_data.py`. The upsert logic (`ON CONFLICT(card_type, front)`) means re-importing is idempotent.
 
+### 3a. COVERED.md Vocabulary Without Pinyin/Translation
+
+Some vocabulary (e.g. `口疮`, `果断`, `漱口`) is listed in `COVERED.md` but was never formally
+introduced in a `## New Vocabulary` table. When imported from COVERED.md, these words would get
+empty pinyin and a category placeholder as the meaning.
+
+To fix this, edit `data/vocab_lookup.json` and add an entry for the word with `pinyin` and `meaning`.
+On next `uv run import_data.py`, the lookup is automatically used. For existing cards already in the
+database, run:
+
+```bash
+uv run migrate_vocab_lookup.py
+```
+
 ### 4. To Reset a Single Card
 
 ```bash
@@ -89,7 +107,11 @@ Paths are resolved relative to the current working directory.
 
 ## Helper Scripts
 
-None yet. The project is small enough that `uv run import_data.py` and `uv run app.py` are the only commands.
+| Script | Purpose |
+|--------|---------|
+| `uv run import_data.py` | Import/refresh all cards from exercise files (+ COVERED.md). |
+| `uv run app.py` | Start the Flask server. |
+| `uv run migrate_vocab_lookup.py` | Backfill pinyin/meaning for cards that were imported from COVERED.md without them. |
 
 ## Design Decisions
 
