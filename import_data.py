@@ -443,8 +443,68 @@ def load_vocab_lookup():
         return json.load(f)
 
 
+def parse_covered_word_tables(filepath):
+    """Parse 'Word | Example | Covered' tables in the Grammar Patterns section of COVERED.md.
+
+    These tables list standalone vocabulary items that were never introduced in a
+    '## New Vocabulary' exercise table but have been covered in use (e.g. in example
+    sentences, reading passages, etc.). Each row gives a Chinese word and its English
+    meaning.
+    """
+    words = []
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            content = f.read()
+    except FileNotFoundError:
+        return words
+
+    # Find the Grammar Patterns section
+    gm = re.search(r"## Grammar Patterns(.*?)(?=\n## Vocabulary|\Z)", content, re.DOTALL)
+    if not gm:
+        return words
+
+    body = gm.group(1)
+
+    # Find the single 'Word | Example | Covered' table in the Grammar Patterns section.
+    # Format:
+    #   | Word | Example | Covered |
+    #   | 自己 | by oneself | basics |
+    #   | ...  | ...       | ...    |
+    #
+    # Note: There is NO separator line (|---|---|) in this table.
+    pattern = re.compile(
+        r"\|\s*Word\s*\|\s*Example\s*\|\s*Covered\s*\|\s*\n"
+        r"(\|.*\|.*\|.*\|\s*\n)+",                     # data rows: | word | example | covered |
+    )
+
+    for tm in pattern.finditer(body):
+        table_body = tm.group(0)
+        # Find the category from the nearest ### header before this table
+        text_before = body[:tm.start()]
+        cat_m = re.findall(r"^###\s+(.+)$", text_before, re.MULTILINE)
+        category = cat_m[-1].strip() if cat_m else "General"
+
+        # Parse each data row
+        for line in table_body.split("\n"):
+            line = line.strip()
+            if not line.startswith("|") or "Word" in line:
+                continue
+            cells = [c.strip() for c in line.split("|")]
+            cells = [c for c in cells if c]
+            if cells and len(cells) >= 1:
+                word = cells[0]
+                if word and re.match(r"[\u4e00-\u9fff]+", word):
+                    words.append((word, category))
+
+    return words
+
+
 def add_additional_vocab_from_covered(conn):
     """Insert vocabulary from COVERED.md that doesn't already exist.
+
+    Sources:
+    1. The ## Vocabulary section (themed vocab lists)
+    2. 'Word | Example | Covered' tables in the ## Grammar Patterns section
 
     Uses insert_if_missing so exercise-file definitions always take priority.
     Uses vocab_lookup.json to provide pinyin and English meaning for words
@@ -455,7 +515,10 @@ def add_additional_vocab_from_covered(conn):
         return
     
     cursor = conn.cursor()
+    
+    # Collect from both sections
     covered_vocab = parse_covered_vocab(covered_path)
+    covered_vocab.extend(parse_covered_word_tables(covered_path))
     
     lookup = load_vocab_lookup()
     
