@@ -1,10 +1,8 @@
 """Vercel serverless entrypoint — wraps the Flask app for WSGI."""
 
-import os
 import sys
+import os
 
-_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if _root not in sys.path:
-    sys.path.insert(0, _root)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import app
