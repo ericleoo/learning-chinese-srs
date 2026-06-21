@@ -449,8 +449,10 @@ def parse_covered_word_tables(filepath):
 
     These tables list standalone vocabulary items that were never introduced in a
     '## New Vocabulary' exercise table but have been covered in use (e.g. in example
-    sentences, reading passages, etc.). Each row gives a Chinese word and its English
-    meaning.
+    sentences, reading passages, etc.). Each row gives a Chinese word, its English
+    meaning, and the category it was covered under.
+
+    Returns list of (char, meaning, category).
     """
     words = []
     try:
@@ -466,7 +468,7 @@ def parse_covered_word_tables(filepath):
 
     body = gm.group(1)
 
-    # Find the single 'Word | Example | Covered' table in the Grammar Patterns section.
+    # Find all 'Word | Example | Covered' tables in the Grammar Patterns section.
     # Format:
     #   | Word | Example | Covered |
     #   | 自己 | by oneself | basics |
@@ -494,8 +496,12 @@ def parse_covered_word_tables(filepath):
             cells = [c for c in cells if c]
             if cells and len(cells) >= 1:
                 word = cells[0]
+                # Extract meaning from the "Example" column (cells[1])
+                meaning = cells[1] if len(cells) > 1 else ""
                 if word and re.match(r"[\u4e00-\u9fff]+", word):
-                    words.append((word, category))
+                    # Clean markdown links from meaning
+                    meaning = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', meaning)
+                    words.append((word, meaning, category))
 
     return words
 
@@ -504,27 +510,24 @@ def add_additional_vocab_from_covered(conn):
     """Insert vocabulary from COVERED.md that doesn't already exist.
 
     Sources:
-    1. The ## Vocabulary section (themed vocab lists)
+    1. The ## Vocabulary section (themed vocab lists) — no meaning in file,
+       uses vocab_lookup.json for pinyin and English meaning.
     2. 'Word | Example | Covered' tables in the ## Grammar Patterns section
+       — English meaning is extracted from the table directly.
 
     Uses insert_if_missing so exercise-file definitions always take priority.
-    Uses vocab_lookup.json to provide pinyin and English meaning for words
-    that were never defined in any New Vocabulary table.
     """
     covered_path = os.path.join(EXERCISES_DIR, "COVERED.md")
     if not os.path.exists(covered_path):
         return
     
     cursor = conn.cursor()
-    
-    # Collect from both sections
-    covered_vocab = parse_covered_vocab(covered_path)
-    covered_vocab.extend(parse_covered_word_tables(covered_path))
-    
     lookup = load_vocab_lookup()
     
     before = conn.execute("SELECT COUNT(*) FROM cards").fetchone()[0]
-    for char, category in covered_vocab:
+    
+    # Source 1: ## Vocabulary section — no meaning in file, use lookup or placeholder
+    for char, category in parse_covered_vocab(covered_path):
         entry = lookup.get(char)
         if entry:
             pinyin = entry.get("pinyin", "")
@@ -532,12 +535,34 @@ def add_additional_vocab_from_covered(conn):
             insert_if_missing(cursor, "vocab", char, meaning, pinyin, category, 0, "")
         else:
             insert_if_missing(cursor, "vocab", char, f"({category})", "", category, 0, "")
+    
+    # Source 2: Word | Example | Covered tables — meaning extracted from table
+    for char, meaning, category in parse_covered_word_tables(covered_path):
+        if not meaning:
+            # Fallback: check lookup
+            entry = lookup.get(char)
+            if entry:
+                meaning = entry.get("meaning", "")
+                pinyin = entry.get("pinyin", "")
+                insert_if_missing(cursor, "vocab", char, meaning, pinyin, category, 0, "")
+                continue
+            else:
+                meaning = f"({category})"
+        # Clean the meaning: remove parenthesized Chinese annotations like "(关系)" but keep the English
+        clean_meaning = re.sub(r'\s*\([\u4e00-\u9fff/]+\)', '', meaning).strip()
+        if not clean_meaning:
+            clean_meaning = meaning
+        # Try to get pinyin from lookup even when meaning is from table
+        pinyin = ""
+        if char in lookup:
+            pinyin = lookup[char].get("pinyin", "")
+        insert_if_missing(cursor, "vocab", char, clean_meaning, pinyin, category, 0, "")
+    
     conn.commit()
     after = conn.execute("SELECT COUNT(*) FROM cards").fetchone()[0]
     added = after - before
-    looked_up = sum(1 for c, _ in covered_vocab if c in lookup)
-    print(f"Added {added} new items from COVERED.md ({len(covered_vocab) - added} already existed from exercise files)")
-    print(f"  - {looked_up} items got pinyin/meaning from vocab_lookup.json")
+    total_from_covered = len(parse_covered_vocab(covered_path)) + len(parse_covered_word_tables(covered_path))
+    print(f"Added {added} new items from COVERED.md ({total_from_covered - added} already existed from exercise files)")
 
 
 def main():

@@ -31,14 +31,16 @@ def main():
 
     conn = get_connection()
 
-    # Find vocab cards with empty pinyin (from COVERED.md)
+    # Find vocab cards with empty pinyin (from COVERED.md) or placeholder backs
     rows = conn.execute(
-        "SELECT id, front, back FROM cards WHERE card_type='vocab' AND (pinyin IS NULL OR pinyin = '')"
+        """SELECT id, front, back, pinyin FROM cards
+           WHERE card_type='vocab'
+             AND ((pinyin IS NULL OR pinyin = '') OR back LIKE '(%')"""
     ).fetchall()
 
     updated = 0
     skipped_no_lookup = 0
-    for card_id, front, old_back in rows:
+    for card_id, front, old_back, old_pinyin in rows:
         entry = lookup.get(front)
         if not entry:
             skipped_no_lookup += 1
@@ -61,6 +63,8 @@ def main():
 
     print(f"Updated {updated} cards with pinyin and English meaning.")
     print(f"Skipped {skipped_no_lookup} cards (not found in vocab_lookup.json).")
+    # Note: some exercise-file grammar words (e.g. 过, 把) may have pinyin but
+    # placeholder backs — they are included in the search above.
     print("Done.")
 
 

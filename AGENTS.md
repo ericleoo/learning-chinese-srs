@@ -96,6 +96,7 @@ This is safe to run any time:
 If exercise file formats change (different table layouts, new sections), edit `import_data.py`:
 
 - `parse_new_vocab()` — parses `## New Vocabulary` tables
+- `parse_covered_word_tables()` — parses `Word | Example | Covered` tables in Grammar Patterns
 - `parse_grammar_patterns()` — parses `## Grammar Pattern` sections
 - `parse_useful_phrases()` — parses `## Useful Phrases` sections
 - `parse_theme()` — extracts theme name (also handles review days)
@@ -105,17 +106,40 @@ After any parser change, re-run `import_data.py`. The upsert logic (`ON CONFLICT
 
 ### 3a. COVERED.md Vocabulary Without Pinyin/Translation
 
-Some vocabulary (e.g. `口疮`, `果断`, `漱口`) is listed in `COVERED.md` but was never formally
-introduced in a `## New Vocabulary` table. When imported from COVERED.md, these words would get
-empty pinyin and a category placeholder as the meaning.
+COVERED.md contains vocabulary from two sources:
+1. **`## Vocabulary` section** — themed word lists (e.g. `迎接宝宝`, `健身`). These have no
+   English meaning in the file — they need `vocab_lookup.json`.
+2. **`Word | Example | Covered` tables** in the Grammar Patterns section. These already contain
+   the English meaning in the "Example" column — the parser extracts it directly.
 
-To fix this, edit `data/vocab_lookup.json` and add an entry for the word with `pinyin` and `meaning`.
-On next `uv run import_data.py`, the lookup is automatically used. For existing cards already in the
-database, run:
+If a word still shows empty pinyin or a placeholder meaning like `(Basics & Negation)`, it likely
+comes from source (1) and needs an entry in `data/vocab_lookup.json`. Edit the file and add:
+
+```json
+"挑战": {"pinyin": "tiǎo zhàn", "meaning": "challenge"}
+```
+
+On next `uv run import_data.py`, the lookup is automatically used for new inserts. For existing
+cards already in the database (with placeholder meaning), run:
 
 ```bash
 uv run migrate_vocab_lookup.py
 ```
+
+> **Note**: When Turso env vars are set, `migrate_vocab_lookup.py` connects to Turso by default.
+> To fix the local SQLite database specifically, set `SRS_DB_PATH=data/srs.db` and unset
+> `TURSO_DATABASE_URL`, or run the script directly against the SQLite file:
+> ```bash
+> python3 -c "
+> import json, sqlite3
+> conn = sqlite3.connect('data/srs.db')
+> lookup = json.load(open('data/vocab_lookup.json'))
+> for r in conn.execute(\"SELECT id, front FROM cards WHERE card_type='vocab' AND (pinyin='' OR back LIKE '(%')\"):
+>     e = lookup.get(r[1])
+>     if e and e['pinyin'] and e['meaning']:
+>         conn.execute('UPDATE cards SET back=?, pinyin=? WHERE id=?', (e['meaning'], e['pinyin'], r[0]))
+> conn.commit(); conn.close()
+> ```
 
 ### 4. To Reset a Single Card
 

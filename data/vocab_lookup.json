@@ -1,87 +1,574 @@
 {
-  "昨天": {"pinyin": "zuó tiān", "meaning": "yesterday"},
-  "今天": {"pinyin": "jīn tiān", "meaning": "today"},
-  "明天": {"pinyin": "míng tiān", "meaning": "tomorrow"},
-  "燕麦": {"pinyin": "yàn mài", "meaning": "oats"},
-  "花生酱": {"pinyin": "huā shēng jiàng", "meaning": "peanut butter"},
-  "豆浆": {"pinyin": "dòu jiāng", "meaning": "soy milk"},
-  "出汗": {"pinyin": "chū hàn", "meaning": "to sweat"},
-  "外向": {"pinyin": "wài xiàng", "meaning": "extroverted / outgoing"},
-  "果断": {"pinyin": "guǒ duàn", "meaning": "decisive / resolute"},
-  "开金店": {"pinyin": "kāi jīn diàn", "meaning": "to run a gold shop"},
-  "健身房": {"pinyin": "jiàn shēn fáng", "meaning": "gym / fitness center"},
-  "代码": {"pinyin": "dài mǎ", "meaning": "code (programming)"},
-  "科技": {"pinyin": "kē jì", "meaning": "technology / science"},
-  "新闻": {"pinyin": "xīn wén", "meaning": "news"},
-  "国际": {"pinyin": "guó jì", "meaning": "international"},
-  "写代码": {"pinyin": "xiě dài mǎ", "meaning": "to write code"},
-  "举重": {"pinyin": "jǔ zhòng", "meaning": "weightlifting"},
-  "深蹲": {"pinyin": "shēn dūn", "meaning": "squat (exercise)"},
-  "硬拉": {"pinyin": "yìng lā", "meaning": "deadlift"},
-  "卧推": {"pinyin": "wò tuī", "meaning": "bench press"},
-  "裤子": {"pinyin": "kù zi", "meaning": "pants / trousers"},
-  "巴刹": {"pinyin": "bā shā", "meaning": "market / bazaar (loanword)"},
-  "湿巴刹": {"pinyin": "shī bā shā", "meaning": "wet market"},
-  "决定": {"pinyin": "jué dìng", "meaning": "to decide / decision"},
-  "差点": {"pinyin": "chà diǎn", "meaning": "almost / nearly"},
-  "确实": {"pinyin": "què shí", "meaning": "indeed / really / certainly"},
-  "怎么样": {"pinyin": "zěn me yàng", "meaning": "how / how about"},
-  "高铁": {"pinyin": "gāo tiě", "meaning": "high-speed rail"},
-  "口疮": {"pinyin": "kǒu chuāng", "meaning": "mouth ulcer / canker sore"},
-  "盐水": {"pinyin": "yán shuǐ", "meaning": "salt water / saline"},
-  "漱口": {"pinyin": "shù kǒu", "meaning": "to rinse the mouth / gargle"},
-  "欢迎光临": {"pinyin": "huān yíng guāng lín", "meaning": "welcome (to customers)"},
-  "随便坐": {"pinyin": "suí biàn zuò", "meaning": "make yourself at home / sit anywhere"},
-  "别客气": {"pinyin": "bié kè qì", "meaning": "don't be polite / you're welcome"},
-  "叫外卖": {"pinyin": "jiào wài mài", "meaning": "to order takeout / delivery"},
-  "送到家": {"pinyin": "sòng dào jiā", "meaning": "deliver to home"},
-  "好评": {"pinyin": "hǎo píng", "meaning": "positive review / praise"},
-  "租房子": {"pinyin": "zū fáng zi", "meaning": "to rent a house / apartment"},
-  "在机场": {"pinyin": "zài jī chǎng", "meaning": "at the airport"},
-  "在酒店": {"pinyin": "zài jiǔ diàn", "meaning": "at the hotel"},
-  "在商场": {"pinyin": "zài shāng chǎng", "meaning": "at the mall"},
-  "在电影院": {"pinyin": "zài diàn yǐng yuàn", "meaning": "at the cinema"},
-  "在博物馆": {"pinyin": "zài bó wù guǎn", "meaning": "at the museum"},
-  "在海边": {"pinyin": "zài hǎi biān", "meaning": "at the seaside / by the beach"},
-  "做运动": {"pinyin": "zuò yùn dòng", "meaning": "to do exercise / workout"},
-  "在美术馆": {"pinyin": "zài měi shù guǎn", "meaning": "at the art gallery"},
-  "在夜市": {"pinyin": "zài yè shì", "meaning": "at the night market"},
-  "在花店": {"pinyin": "zài huā diàn", "meaning": "at the flower shop"},
-  "在书店": {"pinyin": "zài shū diàn", "meaning": "at the bookstore"},
-  "在医院": {"pinyin": "zài yī yuàn", "meaning": "at the hospital"},
-  "参加聚会": {"pinyin": "cān jiā jù huì", "meaning": "to attend a party / gathering"},
-  "修理东西": {"pinyin": "xiū lǐ dōng xi", "meaning": "to repair things"},
-  "在地铁站": {"pinyin": "zài dì tiě zhàn", "meaning": "at the subway station"},
-  "在美食广场": {"pinyin": "zài měi shí guǎng chǎng", "meaning": "at the food court"},
-  "在家放松": {"pinyin": "zài jiā fàng sōng", "meaning": "to relax at home"},
-  "在百货商店": {"pinyin": "zài bǎi huò shāng diàn", "meaning": "at the department store"},
-  "自己": {"pinyin": "zì jǐ", "meaning": "by oneself / oneself"},
-  "意思": {"pinyin": "yì si", "meaning": "meaning / intention"},
-  "问题": {"pinyin": "wèn tí", "meaning": "question / problem"},
-  "没错": {"pinyin": "méi cuò", "meaning": "that's right / correct"},
-  "需要": {"pinyin": "xū yào", "meaning": "need / require"},
-  "应该": {"pinyin": "yīng gāi", "meaning": "should / ought to"},
-  "注意": {"pinyin": "zhù yì", "meaning": "to pay attention / notice"},
-  "结婚": {"pinyin": "jié hūn", "meaning": "to get married"},
-  "怀孕": {"pinyin": "huái yùn", "meaning": "to be pregnant"},
-  "建议": {"pinyin": "jiàn yì", "meaning": "to suggest / suggestion"},
-  "选择": {"pinyin": "xuǎn zé", "meaning": "to choose / choice"},
-  "正常": {"pinyin": "zhèng cháng", "meaning": "normal / regular"},
-  "洗澡": {"pinyin": "xǐ zǎo", "meaning": "to take a bath / shower"},
-  "尽量": {"pinyin": "jǐn liàng", "meaning": "as much as possible"},
-  "月": {"pinyin": "yuè", "meaning": "month"},
-  "年": {"pinyin": "nián", "meaning": "year"},
-  "非常": {"pinyin": "fēi cháng", "meaning": "very / extremely"},
-  "谢谢": {"pinyin": "xiè xie", "meaning": "thank you"},
-  "认识": {"pinyin": "rèn shi", "meaning": "to know / meet (people)"},
-  "笑": {"pinyin": "xiào", "meaning": "to laugh / smile"},
-  "孩子": {"pinyin": "hái zi", "meaning": "child"},
-  "影响": {"pinyin": "yǐng xiǎng", "meaning": "influence / effect"},
-  "情绪": {"pinyin": "qíng xù", "meaning": "emotion / mood"},
-  "之前": {"pinyin": "zhī qián", "meaning": "before / prior"},
-  "照片": {"pinyin": "zhào piàn", "meaning": "photo"},
-  "最后": {"pinyin": "zuì hòu", "meaning": "finally / at last"},
-  "本": {"pinyin": "běn", "meaning": "measure word for books"},
-  "盒": {"pinyin": "hé", "meaning": "box / container"},
-  "钟": {"pinyin": "zhōng", "meaning": "clock / minute"}
+  "昨天": {
+    "pinyin": "zuó tiān",
+    "meaning": "yesterday"
+  },
+  "今天": {
+    "pinyin": "jīn tiān",
+    "meaning": "today"
+  },
+  "明天": {
+    "pinyin": "míng tiān",
+    "meaning": "tomorrow"
+  },
+  "燕麦": {
+    "pinyin": "yàn mài",
+    "meaning": "oats"
+  },
+  "花生酱": {
+    "pinyin": "huā shēng jiàng",
+    "meaning": "peanut butter"
+  },
+  "豆浆": {
+    "pinyin": "dòu jiāng",
+    "meaning": "soy milk"
+  },
+  "出汗": {
+    "pinyin": "chū hàn",
+    "meaning": "to sweat"
+  },
+  "外向": {
+    "pinyin": "wài xiàng",
+    "meaning": "extroverted / outgoing"
+  },
+  "果断": {
+    "pinyin": "guǒ duàn",
+    "meaning": "decisive / resolute"
+  },
+  "开金店": {
+    "pinyin": "kāi jīn diàn",
+    "meaning": "to run a gold shop"
+  },
+  "健身房": {
+    "pinyin": "jiàn shēn fáng",
+    "meaning": "gym / fitness center"
+  },
+  "代码": {
+    "pinyin": "dài mǎ",
+    "meaning": "code (programming)"
+  },
+  "科技": {
+    "pinyin": "kē jì",
+    "meaning": "technology / science"
+  },
+  "新闻": {
+    "pinyin": "xīn wén",
+    "meaning": "news"
+  },
+  "国际": {
+    "pinyin": "guó jì",
+    "meaning": "international"
+  },
+  "写代码": {
+    "pinyin": "xiě dài mǎ",
+    "meaning": "to write code"
+  },
+  "举重": {
+    "pinyin": "jǔ zhòng",
+    "meaning": "weightlifting"
+  },
+  "深蹲": {
+    "pinyin": "shēn dūn",
+    "meaning": "squat (exercise)"
+  },
+  "硬拉": {
+    "pinyin": "yìng lā",
+    "meaning": "deadlift"
+  },
+  "卧推": {
+    "pinyin": "wò tuī",
+    "meaning": "bench press"
+  },
+  "裤子": {
+    "pinyin": "kù zi",
+    "meaning": "pants / trousers"
+  },
+  "巴刹": {
+    "pinyin": "bā shā",
+    "meaning": "market / bazaar (loanword)"
+  },
+  "湿巴刹": {
+    "pinyin": "shī bā shā",
+    "meaning": "wet market"
+  },
+  "决定": {
+    "pinyin": "jué dìng",
+    "meaning": "to decide / decision"
+  },
+  "差点": {
+    "pinyin": "chà diǎn",
+    "meaning": "almost / nearly"
+  },
+  "确实": {
+    "pinyin": "què shí",
+    "meaning": "indeed / really / certainly"
+  },
+  "怎么样": {
+    "pinyin": "zěn me yàng",
+    "meaning": "how / how about"
+  },
+  "高铁": {
+    "pinyin": "gāo tiě",
+    "meaning": "high-speed rail"
+  },
+  "口疮": {
+    "pinyin": "kǒu chuāng",
+    "meaning": "mouth ulcer / canker sore"
+  },
+  "盐水": {
+    "pinyin": "yán shuǐ",
+    "meaning": "salt water / saline"
+  },
+  "漱口": {
+    "pinyin": "shù kǒu",
+    "meaning": "to rinse the mouth / gargle"
+  },
+  "欢迎光临": {
+    "pinyin": "huān yíng guāng lín",
+    "meaning": "welcome (to customers)"
+  },
+  "随便坐": {
+    "pinyin": "suí biàn zuò",
+    "meaning": "make yourself at home / sit anywhere"
+  },
+  "别客气": {
+    "pinyin": "bié kè qì",
+    "meaning": "don't be polite / you're welcome"
+  },
+  "叫外卖": {
+    "pinyin": "jiào wài mài",
+    "meaning": "to order takeout / delivery"
+  },
+  "送到家": {
+    "pinyin": "sòng dào jiā",
+    "meaning": "deliver to home"
+  },
+  "好评": {
+    "pinyin": "hǎo píng",
+    "meaning": "positive review / praise"
+  },
+  "租房子": {
+    "pinyin": "zū fáng zi",
+    "meaning": "to rent a house / apartment"
+  },
+  "在机场": {
+    "pinyin": "zài jī chǎng",
+    "meaning": "at the airport"
+  },
+  "在酒店": {
+    "pinyin": "zài jiǔ diàn",
+    "meaning": "at the hotel"
+  },
+  "在商场": {
+    "pinyin": "zài shāng chǎng",
+    "meaning": "at the mall"
+  },
+  "在电影院": {
+    "pinyin": "zài diàn yǐng yuàn",
+    "meaning": "at the cinema"
+  },
+  "在博物馆": {
+    "pinyin": "zài bó wù guǎn",
+    "meaning": "at the museum"
+  },
+  "在海边": {
+    "pinyin": "zài hǎi biān",
+    "meaning": "at the seaside / by the beach"
+  },
+  "做运动": {
+    "pinyin": "zuò yùn dòng",
+    "meaning": "to do exercise / workout"
+  },
+  "在美术馆": {
+    "pinyin": "zài měi shù guǎn",
+    "meaning": "at the art gallery"
+  },
+  "在夜市": {
+    "pinyin": "zài yè shì",
+    "meaning": "at the night market"
+  },
+  "在花店": {
+    "pinyin": "zài huā diàn",
+    "meaning": "at the flower shop"
+  },
+  "在书店": {
+    "pinyin": "zài shū diàn",
+    "meaning": "at the bookstore"
+  },
+  "在医院": {
+    "pinyin": "zài yī yuàn",
+    "meaning": "at the hospital"
+  },
+  "参加聚会": {
+    "pinyin": "cān jiā jù huì",
+    "meaning": "to attend a party / gathering"
+  },
+  "修理东西": {
+    "pinyin": "xiū lǐ dōng xi",
+    "meaning": "to repair things"
+  },
+  "在地铁站": {
+    "pinyin": "zài dì tiě zhàn",
+    "meaning": "at the subway station"
+  },
+  "在美食广场": {
+    "pinyin": "zài měi shí guǎng chǎng",
+    "meaning": "at the food court"
+  },
+  "在家放松": {
+    "pinyin": "zài jiā fàng sōng",
+    "meaning": "to relax at home"
+  },
+  "在百货商店": {
+    "pinyin": "zài bǎi huò shāng diàn",
+    "meaning": "at the department store"
+  },
+  "自己": {
+    "pinyin": "zì jǐ",
+    "meaning": "by oneself / oneself"
+  },
+  "意思": {
+    "pinyin": "yì si",
+    "meaning": "meaning / intention"
+  },
+  "问题": {
+    "pinyin": "wèn tí",
+    "meaning": "question / problem"
+  },
+  "没错": {
+    "pinyin": "méi cuò",
+    "meaning": "that's right / correct"
+  },
+  "需要": {
+    "pinyin": "xū yào",
+    "meaning": "need / require"
+  },
+  "应该": {
+    "pinyin": "yīng gāi",
+    "meaning": "should / ought to"
+  },
+  "注意": {
+    "pinyin": "zhù yì",
+    "meaning": "to pay attention / notice"
+  },
+  "结婚": {
+    "pinyin": "jié hūn",
+    "meaning": "to get married"
+  },
+  "怀孕": {
+    "pinyin": "huái yùn",
+    "meaning": "to be pregnant"
+  },
+  "建议": {
+    "pinyin": "jiàn yì",
+    "meaning": "to suggest / suggestion"
+  },
+  "选择": {
+    "pinyin": "xuǎn zé",
+    "meaning": "to choose / choice"
+  },
+  "正常": {
+    "pinyin": "zhèng cháng",
+    "meaning": "normal / regular"
+  },
+  "洗澡": {
+    "pinyin": "xǐ zǎo",
+    "meaning": "to take a bath / shower"
+  },
+  "尽量": {
+    "pinyin": "jǐn liàng",
+    "meaning": "as much as possible"
+  },
+  "月": {
+    "pinyin": "yuè",
+    "meaning": "month"
+  },
+  "年": {
+    "pinyin": "nián",
+    "meaning": "year"
+  },
+  "非常": {
+    "pinyin": "fēi cháng",
+    "meaning": "very / extremely"
+  },
+  "谢谢": {
+    "pinyin": "xiè xie",
+    "meaning": "thank you"
+  },
+  "认识": {
+    "pinyin": "rèn shi",
+    "meaning": "to know / meet (people)"
+  },
+  "笑": {
+    "pinyin": "xiào",
+    "meaning": "to laugh / smile"
+  },
+  "孩子": {
+    "pinyin": "hái zi",
+    "meaning": "child"
+  },
+  "影响": {
+    "pinyin": "yǐng xiǎng",
+    "meaning": "influence / effect"
+  },
+  "情绪": {
+    "pinyin": "qíng xù",
+    "meaning": "emotion / mood"
+  },
+  "之前": {
+    "pinyin": "zhī qián",
+    "meaning": "before / prior"
+  },
+  "照片": {
+    "pinyin": "zhào piàn",
+    "meaning": "photo"
+  },
+  "最后": {
+    "pinyin": "zuì hòu",
+    "meaning": "finally / at last"
+  },
+  "本": {
+    "pinyin": "běn",
+    "meaning": "measure word for books"
+  },
+  "盒": {
+    "pinyin": "hé",
+    "meaning": "box / container"
+  },
+  "钟": {
+    "pinyin": "zhōng",
+    "meaning": "clock / minute"
+  },
+  "介绍": {
+    "pinyin": "jiè shào",
+    "meaning": "to introduce"
+  },
+  "父母": {
+    "pinyin": "fù mǔ",
+    "meaning": "parents"
+  },
+  "爸妈": {
+    "pinyin": "bà mā",
+    "meaning": "mom and dad / parents"
+  },
+  "爷爷": {
+    "pinyin": "yé ye",
+    "meaning": "grandfather"
+  },
+  "奶奶": {
+    "pinyin": "nǎi nai",
+    "meaning": "grandmother"
+  },
+  "叔叔": {
+    "pinyin": "shū shu",
+    "meaning": "uncle"
+  },
+  "离开": {
+    "pinyin": "lí kāi",
+    "meaning": "to leave"
+  },
+  "结束": {
+    "pinyin": "jié shù",
+    "meaning": "to end / finish"
+  },
+  "简单": {
+    "pinyin": "jiǎn dān",
+    "meaning": "simple"
+  },
+  "正式": {
+    "pinyin": "zhèng shì",
+    "meaning": "formal / official"
+  },
+  "时刻": {
+    "pinyin": "shí kè",
+    "meaning": "moment / time"
+  },
+  "系": {
+    "pinyin": "xì",
+    "meaning": "system / relation"
+  },
+  "解": {
+    "pinyin": "jiě",
+    "meaning": "to understand / to solve"
+  },
+  "跌": {
+    "pinyin": "diē",
+    "meaning": "to fall / drop"
+  },
+  "些": {
+    "pinyin": "xiē",
+    "meaning": "some / a few"
+  },
+  "希望": {
+    "pinyin": "xī wàng",
+    "meaning": "hope / to wish"
+  },
+  "成": {
+    "pinyin": "chéng",
+    "meaning": "to succeed / to become"
+  },
+  "靠": {
+    "pinyin": "kào",
+    "meaning": "to depend on / by"
+  },
+  "本来": {
+    "pinyin": "běn lái",
+    "meaning": "originally / at first"
+  },
+  "换成": {
+    "pinyin": "huàn chéng",
+    "meaning": "to exchange for / to convert into"
+  },
+  "当成": {
+    "pinyin": "dàng chéng",
+    "meaning": "to regard as / to treat as"
+  },
+  "发生": {
+    "pinyin": "fā shēng",
+    "meaning": "to happen / occur"
+  },
+  "事情": {
+    "pinyin": "shì qing",
+    "meaning": "thing / matter"
+  },
+  "话": {
+    "pinyin": "huà",
+    "meaning": "words / speech"
+  },
+  "发现": {
+    "pinyin": "fā xiàn",
+    "meaning": "to discover / find"
+  },
+  "同意": {
+    "pinyin": "tóng yì",
+    "meaning": "to agree"
+  },
+  "故事": {
+    "pinyin": "gù shì",
+    "meaning": "story"
+  },
+  "作业": {
+    "pinyin": "zuò yè",
+    "meaning": "homework / assignment"
+  },
+  "本身": {
+    "pinyin": "běn shēn",
+    "meaning": "itself / oneself"
+  },
+  "段": {
+    "pinyin": "duàn",
+    "meaning": "measure word for period / segment"
+  },
+  "滴": {
+    "pinyin": "dī",
+    "meaning": "drop"
+  },
+  "翻": {
+    "pinyin": "fān",
+    "meaning": "to flip / turn over"
+  },
+  "挑战": {
+    "pinyin": "tiǎo zhàn",
+    "meaning": "challenge"
+  },
+  "有些": {
+    "pinyin": "yǒu xiē",
+    "meaning": "some / a few"
+  },
+  "开始": {
+    "pinyin": "kāi shǐ",
+    "meaning": "to start / begin"
+  },
+  "迎接宝宝": {
+    "pinyin": "yíng jiē bǎo bǎo",
+    "meaning": "to welcome the baby"
+  },
+  "保持健康": {
+    "pinyin": "bǎo chí jiàn kāng",
+    "meaning": "to maintain health / stay healthy"
+  },
+  "准备迎接宝宝": {
+    "pinyin": "zhǔn bèi yíng jiē bǎo bǎo",
+    "meaning": "to prepare for the baby's arrival"
+  },
+  "新生儿的第一周": {
+    "pinyin": "xīn shēng ér de dì yī zhōu",
+    "meaning": "first week with a newborn"
+  },
+  "时间管理": {
+    "pinyin": "shí jiān guǎn lǐ",
+    "meaning": "time management"
+  },
+  "在家工作": {
+    "pinyin": "zài jiā gōng zuò",
+    "meaning": "to work from home"
+  },
+  "节约时间": {
+    "pinyin": "jié yuē shí jiān",
+    "meaning": "to save time"
+  },
+  "家庭预算": {
+    "pinyin": "jiā tíng yù suàn",
+    "meaning": "family budget"
+  },
+  "健身": {
+    "pinyin": "jiàn shēn",
+    "meaning": "to exercise / fitness / workout"
+  },
+  "分享好消息": {
+    "pinyin": "fēn xiǎng hǎo xiāo xi",
+    "meaning": "to share good news"
+  },
+  "新手爸爸的日常": {
+    "pinyin": "xīn shǒu bà ba de rì cháng",
+    "meaning": "a new dad's daily life"
+  },
+  "满月": {
+    "pinyin": "mǎn yuè",
+    "meaning": "full moon (celebration for a one-month-old)"
+  },
+  "分享育儿经验": {
+    "pinyin": "fēn xiǎng yù ér jīng yàn",
+    "meaning": "to share parenting experience"
+  },
+  "分享兴趣和爱好": {
+    "pinyin": "fēn xiǎng xìng qù hé ài hào",
+    "meaning": "to share interests and hobbies"
+  },
+  "跟朋友分享育儿经验": {
+    "pinyin": "gēn péng yǒu fēn xiǎng yù ér jīng yàn",
+    "meaning": "to share parenting experience with friends"
+  },
+  "育儿": {
+    "pinyin": "yù ér",
+    "meaning": "parenting / child-rearing"
+  },
+  "亲朋好友": {
+    "pinyin": "qīn péng hǎo yǒu",
+    "meaning": "friends and relatives"
+  },
+  "热热闹闹": {
+    "pinyin": "rè rè nào nào",
+    "meaning": "lively and bustling"
+  },
+  "写日记": {
+    "pinyin": "xiě rì jì",
+    "meaning": "to keep a diary / journal"
+  },
+  "买婴儿用品": {
+    "pinyin": "mǎi yīng ér yòng pǐn",
+    "meaning": "to buy baby supplies"
+  },
+  "安排庆祝满月": {
+    "pinyin": "ān pái qìng zhù mǎn yuè",
+    "meaning": "to plan the full moon celebration"
+  },
+  "过": {
+    "pinyin": "guò",
+    "meaning": "to pass / to cross; experiential particle (V+过)"
+  },
+  "把": {
+    "pinyin": "bǎ",
+    "meaning": "to hold; disposal marker (把 structure)"
+  }
 }
