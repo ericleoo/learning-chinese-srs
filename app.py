@@ -4,23 +4,15 @@ Chinese SRS Review App — Flask backend with SM-2 spaced repetition.
 """
 
 import os
-import sqlite3
 from datetime import date, timedelta
 from flask import Flask, jsonify, request, render_template
+from db import get_connection as get_db
 
-app = Flask(__name__)
-
-DB_PATH = os.environ.get(
-    "SRS_DB_PATH",
-    "data/srs.db",
+_ROOT = os.path.dirname(os.path.abspath(__file__))
+app = Flask(__name__,
+    template_folder=os.path.join(_ROOT, "templates"),
+    static_folder=os.path.join(_ROOT, "static"),
 )
-
-
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    return conn
 
 
 def sm2_calculate(easiness, interval, repetitions, quality):

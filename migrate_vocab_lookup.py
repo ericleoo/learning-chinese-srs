@@ -11,6 +11,7 @@ Usage: uv run migrate_vocab_lookup.py [DB_PATH]
 import json
 import os
 import sys
+from db import get_connection
 
 DB_PATH = os.environ.get("SRS_DB_PATH", "data/srs.db")
 
@@ -20,10 +21,6 @@ def main():
     if len(sys.argv) > 1:
         DB_PATH = sys.argv[1]
 
-    if not os.path.exists(DB_PATH):
-        print(f"Database not found: {DB_PATH}")
-        sys.exit(1)
-
     lookup_path = os.path.join(os.path.dirname(DB_PATH), "vocab_lookup.json")
     if not os.path.exists(lookup_path):
         print(f"Lookup file not found: {lookup_path}")
@@ -32,12 +29,10 @@ def main():
     with open(lookup_path, "r", encoding="utf-8") as f:
         lookup = json.load(f)
 
-    import sqlite3
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
+    conn = get_connection()
 
     # Find vocab cards with empty pinyin (from COVERED.md)
-    rows = cur.execute(
+    rows = conn.execute(
         "SELECT id, front, back FROM cards WHERE card_type='vocab' AND (pinyin IS NULL OR pinyin = '')"
     ).fetchall()
 
@@ -55,7 +50,7 @@ def main():
             skipped_no_lookup += 1
             continue
 
-        cur.execute(
+        conn.execute(
             "UPDATE cards SET back = ?, pinyin = ? WHERE id = ?",
             (meaning, pinyin, card_id),
         )

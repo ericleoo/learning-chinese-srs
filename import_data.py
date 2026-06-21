@@ -4,9 +4,10 @@
 import json
 import re
 import os
-import sqlite3
 import sys
+import sqlite3
 from datetime import datetime, date
+from db import TURSO_URL
 
 EXERCISES_DIR = os.environ.get(
     "LEARNING_CHINESE_DIR",
@@ -564,10 +565,13 @@ def main():
         print("Pass the path as an argument or set LEARNING_CHINESE_DIR", file=sys.stderr)
         sys.exit(1)
 
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     print(f"Importing from: {EXERCISES_DIR}")
     print(f"Database at: {DB_PATH}")
+
+    # Always import into local SQLite (fast — local file, batch writes)
+    os.makedirs(os.path.dirname(DB_PATH) or ".", exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA journal_mode=WAL")
     init_db(conn)
 
     # Do NOT wipe data - upsert preserves existing SRS state
@@ -592,6 +596,15 @@ def main():
     print(f"  Themes (exercise days): {theme_count}")
 
     conn.close()
+
+    # Auto-push to Turso if configured
+    if TURSO_URL:
+        print(f"\nTurso detected — syncing to Turso...")
+        sys.stdout.flush()
+        os.environ["SRS_DB_PATH"] = DB_PATH
+        from migrate_to_turso import migrate
+        migrate()
+        print()
 
 
 if __name__ == "__main__":

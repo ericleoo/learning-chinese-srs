@@ -1,0 +1,12 @@
+.venv
+.git
+.gitattributes
+.gitignore
+__pycache__
+*.pyc
+data/*.db
+data/*.db-wal
+data/*.db-shm
+uv.lock
+README.md
+AGENTS.md

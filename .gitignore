@@ -3,6 +3,14 @@
 # Python virtual environment
 .venv/
 
+# Environment variables (API keys, secrets)
+.env
+
+# Turso / SQLite databases
+data/*.db
+data/*.db-wal
+data/*.db-shm
+
 # Python bytecode
 __pycache__/
 *.pyc
