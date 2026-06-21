@@ -179,6 +179,20 @@
     border: 1px solid var(--border);
   }
 
+  .stat-card.loading .stat-value {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  .stat-card.loading .stat-sub,
+  .stat-card.loading .stat-label {
+    color: var(--border);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
   .stat-card .stat-label {
     font-size: 12px;
     font-weight: 500;
@@ -796,6 +810,8 @@ const state = {
   reviewType: 'all',
   isFlipped: false,
   isSubmitting: false,
+  dashboardCache: null,     // last successful dashboard data
+  dashboardLoading: false,
 };
 
 // ─── Theme ──────────────────────────────────────────────────────────────────
@@ -944,23 +960,71 @@ document.querySelectorAll('.nav-links button').forEach(btn => {
 
 // ─── API helpers ────────────────────────────────────────────────────────────
 async function api(url, opts = {}) {
-  const res = await fetch(url, {
-    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-    ...opts,
-  });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  try {
+    const res = await fetch(url, {
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      ...opts,
+    });
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    return res.json();
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 // ─── Dashboard ──────────────────────────────────────────────────────────────
+let dashboardLoaded = false;
+
 async function loadDashboard() {
-  const data = await api('/api/stats');
-  document.getElementById('statDue').textContent = data.due_today || 0;
+  // If we have cached data, render it immediately while refreshing
+  if (state.dashboardCache) {
+    renderDashboard(state.dashboardCache);
+  }
+
+  if (state.dashboardLoading) return;
+  state.dashboardLoading = true;
+
+  try {
+    const [data, act] = await Promise.all([
+      api('/api/stats'),
+      api('/api/activity?days=30'),
+    ]);
+    state.dashboardCache = { stats: data, activity: act };
+    renderDashboard(data, act);
+    dashboardLoaded = true;
+  } catch (e) {
+    console.warn('Dashboard load failed:', e.message);
+    // If we already had cached data, keep showing it
+    if (!state.dashboardCache) {
+      // Brief error indicator — replace "—" with "?" so user knows something is off
+      document.getElementById('statDue').textContent = '?';
+      document.getElementById('statDueSub').textContent = 'Retrying…';
+      // Retry once after a short delay
+      setTimeout(() => {
+        state.dashboardLoading = false;
+        loadDashboard();
+      }, 3000);
+      return;
+    }
+  }
+
+  state.dashboardLoading = false;
+}
+
+function renderDashboard(stats, activity) {
+  const data = stats;
+  const act = activity || (state.dashboardCache && state.dashboardCache.activity);
+
+  // Stats cards
+  document.getElementById('statDue').textContent = data.due_today ?? 0;
   document.getElementById('statDueSub').textContent = `${data.vocab_due || 0} vocab · ${data.grammar_due || 0} grammar · ${data.phrase_due || 0} phrases`;
-  document.getElementById('statReviewed').textContent = data.reviewed_today || 0;
-  document.getElementById('statTotal').textContent = data.total_active || 0;
+  document.getElementById('statReviewed').textContent = data.reviewed_today ?? 0;
+  document.getElementById('statTotal').textContent = data.total_active ?? 0;
   document.getElementById('statNewSub').textContent = `${data.new_cards || 0} new cards`;
-  document.getElementById('statWeek').textContent = data.due_week || 0;
+  document.getElementById('statWeek').textContent = data.due_week ?? 0;
 
   // Breakdown bar
   const total = (data.vocab_count || 0) + (data.grammar_count || 0) + (data.phrase_count || 0) || 1;
@@ -981,15 +1045,15 @@ async function loadDashboard() {
   `;
 
   // Activity chart
-  const act = await api('/api/activity?days=30');
-  const chart = document.getElementById('activityChart');
-  const values = Object.values(act.activity || {}).map(v => v.reviews);
-  const max = Math.max(...values, 1);
-
-  chart.innerHTML = Object.entries(act.activity || {}).map(([day, val]) => {
-    const pct = Math.max(2, (val.reviews / max) * 100);
-    return `<div class="chart-bar" style="height:${pct}%" title="${day}: ${val.reviews} reviews"></div>`;
-  }).join('');
+  if (act && act.activity) {
+    const chart = document.getElementById('activityChart');
+    const values = Object.values(act.activity).map(v => v.reviews);
+    const max = Math.max(...values, 1);
+    chart.innerHTML = Object.entries(act.activity).map(([day, val]) => {
+      const pct = Math.max(2, (val.reviews / max) * 100);
+      return `<div class="chart-bar" style="height:${pct}%" title="${day}: ${val.reviews} reviews"></div>`;
+    }).join('');
+  }
 }
 
 // ─── Review ─────────────────────────────────────────────────────────────────
@@ -997,27 +1061,41 @@ async function loadReview() {
   const filter = state.reviewType;
   const typeParam = filter !== 'all' ? `&type=${filter}` : '';
 
-  // Try due cards first
-  let data = await api(`/api/review/next?limit=20${typeParam}`);
-  let cards = data.cards || [];
+  try {
+    // Try due cards first
+    let data = await api(`/api/review/next?limit=20${typeParam}`);
+    let cards = data.cards || [];
 
-  // If no due cards, get new cards
-  if (cards.length === 0) {
-    state.mode = 'new';
-    data = await api(`/api/review/new?limit=20${typeParam}`);
-    cards = data.cards || [];
+    // If no due cards, get new cards
     if (cards.length === 0) {
-      showReviewComplete();
-      return;
+      state.mode = 'new';
+      data = await api(`/api/review/new?limit=20${typeParam}`);
+      cards = data.cards || [];
+      if (cards.length === 0) {
+        showReviewComplete();
+        return;
+      }
+    } else {
+      state.mode = 'due';
     }
-  } else {
-    state.mode = 'due';
-  }
 
-  state.cards = cards;
-  state.currentIndex = 0;
-  state.isFlipped = false;
-  showCard();
+    state.cards = cards;
+    state.currentIndex = 0;
+    state.isFlipped = false;
+    showCard();
+  } catch (e) {
+    const el = document.getElementById('reviewContent');
+    el.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">⚠️</div>
+        <h2>Could not load cards</h2>
+        <p>There was a problem fetching review cards. The server might still be starting up.</p>
+        <button class="new-cards-link" onclick="loadReview()">Try again</button>
+      </div>
+    `;
+    document.getElementById('ratingSection').classList.remove('visible');
+    document.getElementById('reviewCounter').textContent = '';
+  }
 }
 
 function showReviewComplete() {
@@ -1186,48 +1264,51 @@ async function loadBrowse(append) {
   if (search) params.set('search', search);
   if (type) params.set('type', type);
 
-  const data = await api(`/api/cards?${params}`);
-  const list = document.getElementById('browserList');
-  const empty = document.getElementById('browserEmpty');
-  const countEl = document.getElementById('browserCount');
-  const moreBtn = document.getElementById('browserLoadMore');
+  try {
+    const data = await api(`/api/cards?${params}`);
+    const list = document.getElementById('browserList');
+    const empty = document.getElementById('browserEmpty');
+    const countEl = document.getElementById('browserCount');
+    const moreBtn = document.getElementById('browserLoadMore');
 
-  if (!data.cards || data.cards.length === 0) {
-    if (!append) { list.innerHTML = ''; }
-    empty.style.display = list.innerHTML ? 'none' : 'block';
-    countEl.textContent = data.count ? `${data.count} cards found` : '';
-    moreBtn.style.display = 'none';
-    return;
+    if (!data.cards || data.cards.length === 0) {
+      if (!append) { list.innerHTML = ''; }
+      empty.style.display = list.innerHTML ? 'none' : 'block';
+      countEl.textContent = data.count ? `${data.count} cards found` : '';
+      moreBtn.style.display = 'none';
+      return;
+    }
+
+    empty.style.display = 'none';
+
+    const html = data.cards.map(c => {
+      const typeLabel = { vocab: 'Vocab', grammar: 'Grammar', phrase: 'Phrase' }[c.card_type] || c.card_type;
+      const pinyinHtml = c.card_type === 'vocab' && c.pinyin ? `<span class="item-pinyin">${c.pinyin}</span>` : '';
+
+      return `
+        <div class="browser-item" onclick="viewCard(${c.id})">
+          <span class="item-type ${c.card_type}">${typeLabel}</span>
+          <span class="item-front">${c.front}</span>
+          ${pinyinHtml}
+          <span class="item-back">${renderMarkdown(c.back)}</span>
+        </div>
+      `;
+    }).join('');
+
+    if (append) {
+      list.innerHTML += html;
+    } else {
+      list.innerHTML = html;
+    }
+
+    browseOffset += data.cards.length;
+    const total = data.count || data.total;
+    countEl.textContent = `${browseOffset} of ${total} cards shown`;
+    moreBtn.style.display = browseOffset < total ? 'block' : 'none';
+  } catch (e) {
+    const list = document.getElementById('browserList');
+    list.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><p>Failed to load cards. <a href="#" onclick="loadBrowse(false);return false">Try again</a></p></div>';
   }
-
-  empty.style.display = 'none';
-
-  const today = new Date().toISOString().split('T')[0];
-
-  const html = data.cards.map(c => {
-    const typeLabel = { vocab: 'Vocab', grammar: 'Grammar', phrase: 'Phrase' }[c.card_type] || c.card_type;
-    const pinyinHtml = c.card_type === 'vocab' && c.pinyin ? `<span class="item-pinyin">${c.pinyin}</span>` : '';
-
-    return `
-      <div class="browser-item" onclick="viewCard(${c.id})">
-        <span class="item-type ${c.card_type}">${typeLabel}</span>
-        <span class="item-front">${c.front}</span>
-        ${pinyinHtml}
-        <span class="item-back">${renderMarkdown(c.back)}</span>
-      </div>
-    `;
-  }).join('');
-
-  if (append) {
-    list.innerHTML += html;
-  } else {
-    list.innerHTML = html;
-  }
-
-  browseOffset += data.cards.length;
-  const total = data.count || data.total;
-  countEl.textContent = `${browseOffset} of ${total} cards shown`;
-  moreBtn.style.display = browseOffset < total ? 'block' : 'none';
 }
 
 function loadBrowseMore() {
